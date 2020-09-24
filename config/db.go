@@ -11,10 +11,10 @@ import (
 // Connecting to db
 func Connect() *pg.DB {
 	opts := &pg.Options{
-		User: "cavdy",
-		Password: "postgres",
+		User: "ubuntu",
+		Password: "123456",
 		Addr: "localhost:5432",
-		Database: "go_db",
+		Database: "middleware",
 	}
 
 	var db *pg.DB = pg.Connect(opts)
