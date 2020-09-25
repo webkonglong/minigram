@@ -20,7 +20,40 @@ type Todo struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// Create User Table
+type User struct {
+	ID 			string		`json:"user_id"`
+	EleRecs		[]EleRec	`json:"elerecs"`
+}
+
+type EleRec struct {
+	EleRecID  	string		`json:"elerec_id"`  	// Electronic receipt 电子小票id
+	ShopName	string		`json:"shop_name"` 		// Shop name店家名字
+	TotalPrice	float64		`json:"total_price"`	// Total Price 总金额
+	CreatedAt	time.Time	`json:"created_at"`		// 小票创建时间
+	PayMethod	string		`json:"pay_method"`		// 支付方式
+	Ticket		int32		`json:"ticket"`			// 抵用券
+	SerialNum	string		`json:"serial_num"`		// 流水号
+	Items		[]Item		`json:"item"`			// 具体商品
+	PosNum		string		`json:"pos_num"`		// 收银机号
+}
+
+type Item struct {
+	Name	string	`json:"name"`	// 商品名
+	Amount	uint32	`json:"amount"`	// 商品数量
+	Price	float64	`json:"price"`	// 商品单价
+}
+
+type BloRec struct {
+	BloRecID	string		`json:"blorec_id"`	// 区块链小票 id
+	TxHash		string 		`json:"tx_hash"`	// 区块链小票存证 hash
+	BlockNum	uint32		`json:"block_num"`	// 所在区块
+	CreatedAt	time.Time	`json:"created_at"`	// 创建时间
+}
+
+
+
+
+// Create Todo Table
 func CreateTodoTable(db *pg.DB) error {
 	opts := &orm.CreateTableOptions{
 		IfNotExists: true,
@@ -31,6 +64,48 @@ func CreateTodoTable(db *pg.DB) error {
 		return createError
 	}
 	log.Printf("Todo table created")
+	return nil
+}
+
+// 创建用户表
+func CreateUserTable(db *pg.DB) error {
+	opts := orm.CreateTableOptions{
+		IfNotExists: true,
+	}
+	createError := db.CreateTable(&User, opts)
+	if createError != nil {
+		log.Printf("Error while creating user table, Reason: %v\n", createError)
+		return createError
+	}
+	log.Printf("User table created")
+	return nil
+}
+
+// 创建电子小票表
+func CreateEleRecTable(db *pg.DB) error {
+	opts := orm.CreateTableOptions{
+		IfNotExists: true,
+	}
+	createError := db.CreateTable(&EleRec, opts)
+	if createError != nil {
+		log.Printf("Error while creating elerec table, Reason: %v\n", createError)
+		return createError
+	}
+	log.Printf("EleRec table created")
+	return nil
+}
+
+// 创建区块链小票表
+func CreateBloRecTable(db *pg.DB) error {
+	opts := orm.CreateTableOptions{
+		IfNotExists: true,
+	}
+	createError := db.CreateTable(&BloRec, opts)
+	if createError != nil {
+		log.Printf("Error while creating blorec table, Reason: %v\n", createError)
+		return createError
+	}
+	log.Printf("BloRec table created")
 	return nil
 }
 
@@ -60,6 +135,30 @@ func GetAllTodos(c *gin.Context) {
 	})
 	return
 }
+
+func GetUser(c *gin.Context) {
+	userId := c.Param("userId")
+	user := &User{ID:userId}
+	err := dbConnect.Select(user)
+
+	if  err != nil {
+		log.Printf("Error while getting a user's elerecs, Reason: %v\n", err)
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "user not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Single Todo",
+		"data": todo,
+	})
+	return
+}
+
+func Get
 
 func CreateTodo(c *gin.Context) {
 	var todo Todo
