@@ -24,6 +24,9 @@ func Connect() *pg.DB {
 	}
 	log.Printf("Connected to db")
 	controllers.CreateTodoTable(db)
+	controllers.CreateUserTable(db)
+	controllers.CreateEleRecTable(db)
+	controllers.CreateBloRecTable(db)
 	controllers.InitiateDB(db)
 	return db
 }

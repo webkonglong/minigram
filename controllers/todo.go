@@ -69,10 +69,10 @@ func CreateTodoTable(db *pg.DB) error {
 
 // 创建用户表
 func CreateUserTable(db *pg.DB) error {
-	opts := orm.CreateTableOptions{
+	opts := &orm.CreateTableOptions{
 		IfNotExists: true,
 	}
-	createError := db.CreateTable(&User, opts)
+	createError := db.CreateTable(&User{}, opts)
 	if createError != nil {
 		log.Printf("Error while creating user table, Reason: %v\n", createError)
 		return createError
@@ -83,10 +83,10 @@ func CreateUserTable(db *pg.DB) error {
 
 // 创建电子小票表
 func CreateEleRecTable(db *pg.DB) error {
-	opts := orm.CreateTableOptions{
+	opts := &orm.CreateTableOptions{
 		IfNotExists: true,
 	}
-	createError := db.CreateTable(&EleRec, opts)
+	createError := db.CreateTable(&EleRec{}, opts)
 	if createError != nil {
 		log.Printf("Error while creating elerec table, Reason: %v\n", createError)
 		return createError
@@ -97,10 +97,10 @@ func CreateEleRecTable(db *pg.DB) error {
 
 // 创建区块链小票表
 func CreateBloRecTable(db *pg.DB) error {
-	opts := orm.CreateTableOptions{
+	opts := &orm.CreateTableOptions{
 		IfNotExists: true,
 	}
-	createError := db.CreateTable(&BloRec, opts)
+	createError := db.CreateTable(&BloRec{}, opts)
 	if createError != nil {
 		log.Printf("Error while creating blorec table, Reason: %v\n", createError)
 		return createError
@@ -175,7 +175,7 @@ func GetElerec(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "Electronic receipt detail",
-		"data": user,
+		"data": eleRec,
 	})
 	return
 }
@@ -183,7 +183,7 @@ func GetElerec(c *gin.Context) {
 
 func GetBlorec(c *gin.Context) {
 	recId := c.Param("recId")
-	bloRec := &EleRec{BloRecID:recId}
+	bloRec := &BloRec{BloRecID:recId}
 	err := dbConnect.Select(bloRec)
 
 	if  err != nil {
@@ -198,7 +198,7 @@ func GetBlorec(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "blockchain receipt detail",
-		"data": user,
+		"data": bloRec,
 	})
 	return
 }
