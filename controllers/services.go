@@ -11,15 +11,6 @@ import (
 	guuid "github.com/google/uuid"
 )
 
-type Todo struct {
-	ID        string    `json:"id"`
-	Title     string    `json:"title"`
-	Body      string    `json:"body"`
-	Completed string      `json:"completed"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-}
-
 type User struct {
 	ID 			string		`json:"user_id"`
 	EleRecs		[]EleRec	`json:"elerecs"`
@@ -27,13 +18,14 @@ type User struct {
 
 type EleRec struct {
 	EleRecID  	string		`json:"elerec_id"`  	// Electronic receipt 电子小票id
+	UserID 		string		`json:"user_id"`		// 用户id，表示这是谁的小票
 	ShopName	string		`json:"shop_name"` 		// Shop name店家名字
 	TotalPrice	float64		`json:"total_price"`	// Total Price 总金额
 	CreatedAt	time.Time	`json:"created_at"`		// 小票创建时间
 	PayMethod	string		`json:"pay_method"`		// 支付方式
 	Ticket		int32		`json:"ticket"`			// 抵用券
 	SerialNum	string		`json:"serial_num"`		// 流水号
-	Items		[]Item		`json:"item"`			// 具体商品
+	Items		[]Item		`json:"items"`			// 具体商品
 	PosNum		string		`json:"pos_num"`		// 收银机号
 }
 
@@ -50,22 +42,6 @@ type BloRec struct {
 	CreatedAt	time.Time	`json:"created_at"`	// 创建时间
 }
 
-
-
-
-// Create Todo Table
-func CreateTodoTable(db *pg.DB) error {
-	opts := &orm.CreateTableOptions{
-		IfNotExists: true,
-	}
-	createError := db.CreateTable(&Todo{}, opts)
-	if createError != nil {
-		log.Printf("Error while creating todo table, Reason: %v\n", createError)
-		return createError
-	}
-	log.Printf("Todo table created")
-	return nil
-}
 
 // 创建用户表
 func CreateUserTable(db *pg.DB) error {
@@ -115,27 +91,6 @@ func InitiateDB(db *pg.DB) {
 	dbConnect = db
 }
 
-func GetAllTodos(c *gin.Context) {
-	var todos []Todo
-	err := dbConnect.Model(&todos).Select()
-
-	if err != nil {
-		log.Printf("Error while getting all todos, Reason: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": "Something went wrong",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"status":  http.StatusOK,
-		"message": "All Todos",
-		"data": todos,
-	})
-	return
-}
-
 func GetUser(c *gin.Context) {
 	userId := c.Param("userId")
 	user := &User{ID:userId}
@@ -152,7 +107,7 @@ func GetUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
-		"message": "Single Todo",
+		"message": "user info",
 		"data": user,
 	})
 	return
@@ -203,25 +158,18 @@ func GetBlorec(c *gin.Context) {
 	return
 }
 
-
-func CreateTodo(c *gin.Context) {
-	var todo Todo
-	c.BindJSON(&todo)
-	title := todo.Title
-	body := todo.Body
-	completed := todo.Completed
-	id := guuid.New().String()
-
-	insertError := dbConnect.Insert(&Todo{
+func CreateUser(c *gin.Context) {
+	var user User
+	c.BindJSON(&user)
+	id := User.ID
+	
+	insertError := dbConnect.Insert(&User{
 		ID:         id,
-		Title:       title,
-		Body:      body,
-		Completed:     completed,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+		EleRecs:  	[]EleRec,
 	})
+
 	if insertError != nil {
-		log.Printf("Error while inserting new todo into db, Reason: %v\n", insertError)
+		log.Printf("Error while inserting new user into db, Reason: %v\n", insertError)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Something went wrong",
@@ -231,40 +179,70 @@ func CreateTodo(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status":  http.StatusCreated,
-		"message": "Todo created Successfully",
+		"message": "User created Successfully",
 	})
 	return
 }
 
-func GetSingleTodo(c *gin.Context) {
-	todoId := c.Param("todoId")
-	todo := &Todo{ID: todoId}
-	err := dbConnect.Select(todo)
+func CreateElerec(c *gin.Context) {
+	var elerec EleRec
+	var items []Item
+	var user User
 
-	if err != nil {
-		log.Printf("Error while getting a single todo, Reason: %v\n", err)
-		c.JSON(http.StatusNotFound, gin.H{
-			"status":  http.StatusNotFound,
-			"message": "Todo not found",
+	c.BindJSON(&EleRec)
+	elerec_id := elerec.EleRecID
+	user_id := elerec.UserID
+	shop_name := elerec.ShopName
+	total_price := elerec.TotalPrice
+	created_at := elerec.CreatedAt
+	pay_method := elerec.PayMethod
+	ticket := elerec.Ticket
+	serial_num := elerec.SerialNum
+	items = elerec.Items
+	pos_num := elerec.PosNum
+
+	insertError := dbConnect.Insert(&EleRec{
+		EleRecID:	elerec_id
+		UserID:		user_id
+		ShopName:	shop_name
+		TotalPrice:	total_price
+		CreatedAt:	created_at
+		PayMethod:	pay_method
+		Ticket:		ticket
+		SerialNum:	serial_num
+		Items:		items
+		PosNum:		pos_num
+	})
+
+	if insertError != nil {
+		log.Printf("Error while inserting new electronic receipt into db, Reason: %v\n", insertError)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Something went wrong",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  http.StatusOK,
-		"message": "Single Todo",
-		"data": todo,
+	c.JSON(http.StatusCreated, gin.H{
+		"status":  http.StatusCreated,
+		"message": "Electronic receipt created Successfully",
 	})
-	return
-}
 
-func EditTodo(c *gin.Context) {
-	todoId := c.Param("todoId")
-	var todo Todo
-	c.BindJSON(&todo)
-	completed := todo.Completed
+	elerecs := user.EleRecs
+	elerecs = append(elerecs, EleRec{
+		EleRecID:	elerec_id
+		UserID:		user_id
+		ShopName:	shop_name
+		TotalPrice:	total_price
+		CreatedAt:	created_at
+		PayMethod:	pay_method
+		Ticket:		ticket
+		SerialNum:	serial_num
+		Items:		items
+		PosNum:		pos_num
+	})
 
-	_, err := dbConnect.Model(&Todo{}).Set("completed = ?", completed).Where("id = ?", todoId).Update()
+	_, err := dbConnect.Model(&User{}).Set("elerecs = ?", elerecs).Where("id = ?", user_id).Update()
 	if err != nil {
 		log.Printf("Error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -276,18 +254,28 @@ func EditTodo(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  200,
-		"message": "Todo Edited Successfully",
+		"message": "User's electric receipt update Successfully",
 	})
 	return
 }
 
-func DeleteTodo(c *gin.Context) {
-	todoId := c.Param("todoId")
-	todo := &Todo{ID: todoId}
+func CreateBlorec(c *gin.Context) {
+	var blorec BloRec
+	c.BindJSON(&blorec)
+	blorec_id := BloRec.BloRecID
+	tx_hash := BloRec.TxHash
+	block_num := BloRec.BlockNum
+	created_at := BloRec.CreatedAt
+	
+	insertError := dbConnect.Insert(&BloRec{
+		BloRecID:       blorec_id,
+		TxHash:			tx_hash,
+		BlockNum:		block_num,
+		CreatedAt:		created_at,
+	})
 
-	err := dbConnect.Delete(todo)
-	if err != nil {
-		log.Printf("Error while deleting a single todo, Reason: %v\n", err)
+	if insertError != nil {
+		log.Printf("Error while inserting new block receipt into db, Reason: %v\n", insertError)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Something went wrong",
@@ -295,9 +283,9 @@ func DeleteTodo(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  http.StatusOK,
-		"message": "Todo deleted successfully",
+	c.JSON(http.StatusCreated, gin.H{
+		"status":  http.StatusCreated,
+		"message": "receipt created Successfully",
 	})
 	return
 }

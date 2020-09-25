@@ -10,12 +10,12 @@ import (
 // 对于某一确定小票，其电子小票和区块链小票id相同
 func Routes(router *gin.Engine) {
 	router.GET("/", welcome)
-	router.GET("/todos", controllers.GetAllTodos)
-	router.POST("/todo", controllers.CreateTodo)
-	router.GET("/v1/user/:userId", controllers.GetUser) // 某用户的小票记录
-	router.GET("/v1/elerec/:recId", controllers.GetElerec) // Electronic receipt 某具体电子小票详细信息
-	router.GET("/v1/blorec/:recId", controllers.GetBlorec) // blockchain receipt 某具体区块链小票详细信息
-	router.DELETE("/todo/:todoId", controllers.DeleteTodo)
+	router.POST("/v1/user", controllers.CreateUser)			// 创建用户
+	router.POST("/v1/elerec", controllers.CreateElerec)		// 创建电子小票
+	router.POST("/v1/blorec", controllers.CreateBlorec)		// 创建区块链小票
+	router.GET("/v1/user/:userId", controllers.GetUser) 	// 某用户的小票记录
+	router.GET("/v1/elerec/:recId", controllers.GetElerec) 	// Electronic receipt 某具体电子小票详细信息
+	router.GET("/v1/blorec/:recId", controllers.GetBlorec) 	// blockchain receipt 某具体区块链小票详细信息
 	router.NoRoute(notFound)
 }
 
