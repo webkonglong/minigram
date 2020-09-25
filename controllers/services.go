@@ -224,7 +224,7 @@ func CreateElerec(c *gin.Context) {
 
 
 	elerecs := user.EleRecs
-	elerecs = append(elerecs, EleRec{
+	elerecs = append(elerecs, &EleRec{
 		ID:         elerec_id,
 		UserID:     user_id,
 		ShopName:   shop_name,
@@ -239,7 +239,7 @@ func CreateElerec(c *gin.Context) {
 
 	_, err := dbConnect.Model(&User{}).Set("elerecs = ?", elerecs).Where("id = ?", user_id).Update()
 	if err != nil {
-		log.Printf("Error, Reason: %v\n", err)
+		log.Printf("insert electronic receipt to user error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Something went wrong: Error while add new electronic receipt a user",
