@@ -11,7 +11,7 @@ import (
 )
 
 type User struct {
-	ID 			string		`json:"user_id"`
+	UserID 			string		`json:"user_id"`
 	EleRecs		[]EleRec	`json:"elerecs"`
 }
 
@@ -160,11 +160,11 @@ func GetBlorec(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var user User
 	c.BindJSON(&user)
-	id := user.ID
+	user_id := user.UserID
 	var elerecs []EleRec
 	
 	insertError := dbConnect.Insert(&User{
-		ID:         id,
+		UserID:		user_id,
 		EleRecs:  elerecs,
 	})
 
@@ -242,7 +242,7 @@ func CreateElerec(c *gin.Context) {
 		PosNum:		pos_num,
 	})
 
-	_, err := dbConnect.Model(&User{}).Set("elerecs = ?", elerecs).Where("id = ?", user_id).Update()
+	_, err := dbConnect.Model(&User{}).Set("elerecs = ?", elerecs).Where("user_id = ?", user_id).Update()
 	if err != nil {
 		log.Printf("Error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
