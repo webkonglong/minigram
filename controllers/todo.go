@@ -153,12 +153,56 @@ func GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "Single Todo",
-		"data": todo,
+		"data": user,
 	})
 	return
 }
 
-func Get
+func GetElerec(c *gin.Context) {
+	recId := c.Param("recId")
+	eleRec := &EleRec{EleRecID:recId}
+	err := dbConnect.Select(eleRec)
+
+	if  err != nil {
+		log.Printf("Error while getting a elerecs's details, Reason: %v\n", err)
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Electronic receipt not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Electronic receipt detail",
+		"data": user,
+	})
+	return
+}
+
+
+func GetBlorec(c *gin.Context) {
+	recId := c.Param("recId")
+	bloRec := &EleRec{BloRecID:recId}
+	err := dbConnect.Select(bloRec)
+
+	if  err != nil {
+		log.Printf("Error while getting a blorec's details, Reason: %v\n", err)
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "blockchain receipt not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "blockchain receipt detail",
+		"data": user,
+	})
+	return
+}
+
 
 func CreateTodo(c *gin.Context) {
 	var todo Todo
