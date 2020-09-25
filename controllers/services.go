@@ -222,7 +222,17 @@ func CreateElerec(c *gin.Context) {
 		return
 	}
 
-
+	user = &User{ID: user_id}
+	err := dbConnect.Select(user)
+	if err != nil {
+		log.Printf("Error while getting a user, Reason: %v\n", err)
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "user not found",
+		})
+		return
+	}
+	
 	elerecs := user.EleRecs
 	elerecs = append(elerecs, &EleRec{
 		ID:         elerec_id,
