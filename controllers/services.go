@@ -222,10 +222,12 @@ func CreateElerec(c *gin.Context) {
 		return
 	}
 
-	user = &User{ID: user_id}
-	err := dbConnect.Select(user)
-	if err != nil {
-		log.Printf("Error while getting a user, Reason: %v\n", err)
+	log.Printf("test: %v\n", user_id)
+
+	user = User{ID: user_id}
+	getErr := dbConnect.Select(user)
+	if getErr != nil {
+		log.Printf("Error while getting a user, Reason: %v\n", getErr)
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  http.StatusNotFound,
 			"message": "user not found",
