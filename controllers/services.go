@@ -22,7 +22,7 @@ type EleRec struct {
 	TotalPrice float64   `json:"total_price"` // Total Price 总金额
 	CreatedAt  time.Time `json:"created_at"`  // 小票创建时间
 	PayMethod  string    `json:"pay_method"`  // 支付方式
-	Ticket     int32     `json:"ticket"`      // 抵用券
+	Ticket     float64   `json:"ticket"`      // 抵用券
 	SerialNum  string    `json:"serial_num"`  // 流水号
 	Items      []Item    `json:"items"`       // 具体商品
 	PosNum     string    `json:"pos_num"`     // 收银机号
@@ -217,15 +217,11 @@ func CreateElerec(c *gin.Context) {
 		log.Printf("Error while inserting new electronic receipt into db, Reason: %v\n", insertError)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Something went wrong",
+			"message": "Something went wrong: Error while inserting new electronic receipt into db",
 		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"status":  http.StatusCreated,
-		"message": "Electronic receipt created Successfully",
-	})
 
 	elerecs := user.EleRecs
 	elerecs = append(elerecs, EleRec{
@@ -245,8 +241,8 @@ func CreateElerec(c *gin.Context) {
 	if err != nil {
 		log.Printf("Error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  500,
-			"message": "Something went wrong",
+			"status":  http.StatusInternalServerError,
+			"message": "Something went wrong: Error while add new electronic receipt a user",
 		})
 		return
 	}
