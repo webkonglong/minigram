@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	orm "github.com/go-pg/pg/v9/orm"
 	"github.com/go-pg/pg/v9"
-	guuid "github.com/google/uuid"
 )
 
 type User struct {
@@ -161,11 +160,12 @@ func GetBlorec(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var user User
 	c.BindJSON(&user)
-	id := User.ID
+	id := user.ID
+	var elerecs []EleRec
 	
 	insertError := dbConnect.Insert(&User{
 		ID:         id,
-		EleRecs:  	[]EleRec,
+		EleRecs:  elerecs,
 	})
 
 	if insertError != nil {
@@ -189,7 +189,7 @@ func CreateElerec(c *gin.Context) {
 	var items []Item
 	var user User
 
-	c.BindJSON(&EleRec)
+	c.BindJSON(&elerec)
 	elerec_id := elerec.EleRecID
 	user_id := elerec.UserID
 	shop_name := elerec.ShopName
@@ -202,16 +202,16 @@ func CreateElerec(c *gin.Context) {
 	pos_num := elerec.PosNum
 
 	insertError := dbConnect.Insert(&EleRec{
-		EleRecID:	elerec_id
-		UserID:		user_id
-		ShopName:	shop_name
-		TotalPrice:	total_price
-		CreatedAt:	created_at
-		PayMethod:	pay_method
-		Ticket:		ticket
-		SerialNum:	serial_num
-		Items:		items
-		PosNum:		pos_num
+		EleRecID:	elerec_id,
+		UserID:		user_id,
+		ShopName:	shop_name,
+		TotalPrice:	total_price,
+		CreatedAt:	created_at,
+		PayMethod:	pay_method,
+		Ticket:		ticket,
+		SerialNum:	serial_num,
+		Items:		items,
+		PosNum:		pos_num,
 	})
 
 	if insertError != nil {
@@ -230,16 +230,16 @@ func CreateElerec(c *gin.Context) {
 
 	elerecs := user.EleRecs
 	elerecs = append(elerecs, EleRec{
-		EleRecID:	elerec_id
-		UserID:		user_id
-		ShopName:	shop_name
-		TotalPrice:	total_price
-		CreatedAt:	created_at
-		PayMethod:	pay_method
-		Ticket:		ticket
-		SerialNum:	serial_num
-		Items:		items
-		PosNum:		pos_num
+		EleRecID:	elerec_id,
+		UserID:		user_id,
+		ShopName:	shop_name,
+		TotalPrice:	total_price,
+		CreatedAt:	created_at,
+		PayMethod:	pay_method,
+		Ticket:		ticket,
+		SerialNum:	serial_num,
+		Items:		items,
+		PosNum:		pos_num,
 	})
 
 	_, err := dbConnect.Model(&User{}).Set("elerecs = ?", elerecs).Where("id = ?", user_id).Update()
@@ -262,10 +262,10 @@ func CreateElerec(c *gin.Context) {
 func CreateBlorec(c *gin.Context) {
 	var blorec BloRec
 	c.BindJSON(&blorec)
-	blorec_id := BloRec.BloRecID
-	tx_hash := BloRec.TxHash
-	block_num := BloRec.BlockNum
-	created_at := BloRec.CreatedAt
+	blorec_id := blorec.BloRecID
+	tx_hash := blorec.TxHash
+	block_num := blorec.BlockNum
+	created_at := blorec.CreatedAt
 	
 	insertError := dbConnect.Insert(&BloRec{
 		BloRecID:       blorec_id,
