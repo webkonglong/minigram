@@ -6,41 +6,40 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	orm "github.com/go-pg/pg/v9/orm"
 	"github.com/go-pg/pg/v9"
+	orm "github.com/go-pg/pg/v9/orm"
 )
 
 type User struct {
-	UserID 			string		`json:"user_id"`
-	EleRecs		[]EleRec	`json:"elerecs"`
+	ID      string   `json:"id"`
+	EleRecs []EleRec `json:"elerecs"`
 }
 
 type EleRec struct {
-	EleRecID  	string		`json:"elerec_id"`  	// Electronic receipt 电子小票id
-	UserID 		string		`json:"user_id"`		// 用户id，表示这是谁的小票
-	ShopName	string		`json:"shop_name"` 		// Shop name店家名字
-	TotalPrice	float64		`json:"total_price"`	// Total Price 总金额
-	CreatedAt	time.Time	`json:"created_at"`		// 小票创建时间
-	PayMethod	string		`json:"pay_method"`		// 支付方式
-	Ticket		int32		`json:"ticket"`			// 抵用券
-	SerialNum	string		`json:"serial_num"`		// 流水号
-	Items		[]Item		`json:"items"`			// 具体商品
-	PosNum		string		`json:"pos_num"`		// 收银机号
+	ID         string    `json:"id"`          // Electronic receipt 电子小票id
+	UserID     string    `json:"user_id"`     // 用户id，表示这是谁的小票
+	ShopName   string    `json:"shop_name"`   // Shop name店家名字
+	TotalPrice float64   `json:"total_price"` // Total Price 总金额
+	CreatedAt  time.Time `json:"created_at"`  // 小票创建时间
+	PayMethod  string    `json:"pay_method"`  // 支付方式
+	Ticket     int32     `json:"ticket"`      // 抵用券
+	SerialNum  string    `json:"serial_num"`  // 流水号
+	Items      []Item    `json:"items"`       // 具体商品
+	PosNum     string    `json:"pos_num"`     // 收银机号
 }
 
 type Item struct {
-	Name	string	`json:"name"`	// 商品名
-	Amount	uint32	`json:"amount"`	// 商品数量
-	Price	float64	`json:"price"`	// 商品单价
+	Name   string  `json:"name"`   // 商品名
+	Amount uint32  `json:"amount"` // 商品数量
+	Price  float64 `json:"price"`  // 商品单价
 }
 
 type BloRec struct {
-	BloRecID	string		`json:"blorec_id"`	// 区块链小票 id
-	TxHash		string 		`json:"tx_hash"`	// 区块链小票存证 hash
-	BlockNum	uint32		`json:"block_num"`	// 所在区块
-	CreatedAt	time.Time	`json:"created_at"`	// 创建时间
+	ID        string    `json:"id"`         // 区块链小票 id
+	TxHash    string    `json:"tx_hash"`    // 区块链小票存证 hash
+	BlockNum  uint32    `json:"block_num"`  // 所在区块
+	CreatedAt time.Time `json:"created_at"` // 创建时间
 }
-
 
 // 创建用户表
 func CreateUserTable(db *pg.DB) error {
@@ -86,16 +85,17 @@ func CreateBloRecTable(db *pg.DB) error {
 
 // INITIALIZE DB CONNECTION (TO AVOID TOO MANY CONNECTION)
 var dbConnect *pg.DB
+
 func InitiateDB(db *pg.DB) {
 	dbConnect = db
 }
 
 func GetUser(c *gin.Context) {
 	userId := c.Param("userId")
-	user := &User{ID:userId}
+	user := &User{ID: userId}
 	err := dbConnect.Select(user)
 
-	if  err != nil {
+	if err != nil {
 		log.Printf("Error while getting a user's elerecs, Reason: %v\n", err)
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  http.StatusNotFound,
@@ -107,17 +107,17 @@ func GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "user info",
-		"data": user,
+		"data":    user,
 	})
 	return
 }
 
 func GetElerec(c *gin.Context) {
 	recId := c.Param("recId")
-	eleRec := &EleRec{EleRecID:recId}
+	eleRec := &EleRec{ID: recId}
 	err := dbConnect.Select(eleRec)
 
-	if  err != nil {
+	if err != nil {
 		log.Printf("Error while getting a elerecs's details, Reason: %v\n", err)
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  http.StatusNotFound,
@@ -129,18 +129,17 @@ func GetElerec(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "Electronic receipt detail",
-		"data": eleRec,
+		"data":    eleRec,
 	})
 	return
 }
 
-
 func GetBlorec(c *gin.Context) {
 	recId := c.Param("recId")
-	bloRec := &BloRec{BloRecID:recId}
+	bloRec := &BloRec{ID: recId}
 	err := dbConnect.Select(bloRec)
 
-	if  err != nil {
+	if err != nil {
 		log.Printf("Error while getting a blorec's details, Reason: %v\n", err)
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":  http.StatusNotFound,
@@ -152,7 +151,7 @@ func GetBlorec(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusOK,
 		"message": "blockchain receipt detail",
-		"data": bloRec,
+		"data":    bloRec,
 	})
 	return
 }
@@ -160,12 +159,12 @@ func GetBlorec(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var user User
 	c.BindJSON(&user)
-	user_id := user.UserID
+	user_id := user.ID
 	var elerecs []EleRec
-	
+
 	insertError := dbConnect.Insert(&User{
-		UserID:		user_id,
-		EleRecs:  elerecs,
+		ID:      user_id,
+		EleRecs: elerecs,
 	})
 
 	if insertError != nil {
@@ -190,7 +189,7 @@ func CreateElerec(c *gin.Context) {
 	var user User
 
 	c.BindJSON(&elerec)
-	elerec_id := elerec.EleRecID
+	elerec_id := elerec.ID
 	user_id := elerec.UserID
 	shop_name := elerec.ShopName
 	total_price := elerec.TotalPrice
@@ -202,16 +201,16 @@ func CreateElerec(c *gin.Context) {
 	pos_num := elerec.PosNum
 
 	insertError := dbConnect.Insert(&EleRec{
-		EleRecID:	elerec_id,
-		UserID:		user_id,
-		ShopName:	shop_name,
-		TotalPrice:	total_price,
-		CreatedAt:	created_at,
-		PayMethod:	pay_method,
-		Ticket:		ticket,
-		SerialNum:	serial_num,
-		Items:		items,
-		PosNum:		pos_num,
+		ID:         elerec_id,
+		UserID:     user_id,
+		ShopName:   shop_name,
+		TotalPrice: total_price,
+		CreatedAt:  created_at,
+		PayMethod:  pay_method,
+		Ticket:     ticket,
+		SerialNum:  serial_num,
+		Items:      items,
+		PosNum:     pos_num,
 	})
 
 	if insertError != nil {
@@ -230,24 +229,24 @@ func CreateElerec(c *gin.Context) {
 
 	elerecs := user.EleRecs
 	elerecs = append(elerecs, EleRec{
-		EleRecID:	elerec_id,
-		UserID:		user_id,
-		ShopName:	shop_name,
-		TotalPrice:	total_price,
-		CreatedAt:	created_at,
-		PayMethod:	pay_method,
-		Ticket:		ticket,
-		SerialNum:	serial_num,
-		Items:		items,
-		PosNum:		pos_num,
+		ID:         elerec_id,
+		UserID:     user_id,
+		ShopName:   shop_name,
+		TotalPrice: total_price,
+		CreatedAt:  created_at,
+		PayMethod:  pay_method,
+		Ticket:     ticket,
+		SerialNum:  serial_num,
+		Items:      items,
+		PosNum:     pos_num,
 	})
 
-	_, err := dbConnect.Model(&User{}).Set("elerecs = ?", elerecs).Where("user_id = ?", user_id).Update()
+	_, err := dbConnect.Model(&User{}).Set("elerecs = ?", elerecs).Where("id = ?", user_id).Update()
 	if err != nil {
 		log.Printf("Error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": 500,
-			"message":  "Something went wrong",
+			"status":  500,
+			"message": "Something went wrong",
 		})
 		return
 	}
@@ -262,16 +261,16 @@ func CreateElerec(c *gin.Context) {
 func CreateBlorec(c *gin.Context) {
 	var blorec BloRec
 	c.BindJSON(&blorec)
-	blorec_id := blorec.BloRecID
+	blorec_id := blorec.ID
 	tx_hash := blorec.TxHash
 	block_num := blorec.BlockNum
 	created_at := blorec.CreatedAt
-	
+
 	insertError := dbConnect.Insert(&BloRec{
-		BloRecID:       blorec_id,
-		TxHash:			tx_hash,
-		BlockNum:		block_num,
-		CreatedAt:		created_at,
+		ID:        blorec_id,
+		TxHash:    tx_hash,
+		BlockNum:  block_num,
+		CreatedAt: created_at,
 	})
 
 	if insertError != nil {

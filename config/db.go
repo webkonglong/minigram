@@ -1,9 +1,9 @@
 package config
 
 import (
+	"github.com/go-pg/pg/v9"
 	"log"
 	"os"
-	"github.com/go-pg/pg/v9"
 
 	controllers "github.com/flyq/minigram/controllers"
 )
@@ -11,10 +11,10 @@ import (
 // Connecting to db
 func Connect() *pg.DB {
 	opts := &pg.Options{
-		User: "ubuntu",
+		User:     "ubuntu",
 		Password: "123456",
-		Addr: "localhost:5432",
-		Database: "middleware",
+		Addr:     "localhost:5432",
+		Database: "middleware_hn",
 	}
 
 	var db *pg.DB = pg.Connect(opts)

@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	
+
 	"github.com/gin-gonic/gin"
 
 	config "github.com/flyq/minigram/config"
