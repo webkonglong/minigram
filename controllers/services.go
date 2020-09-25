@@ -224,7 +224,7 @@ func CreateElerec(c *gin.Context) {
 
 
 	elerecs := user.EleRecs
-	elerecs = append(elerecs, &EleRec{
+	elerecs = append(elerecs, EleRec{
 		ID:         elerec_id,
 		UserID:     user_id,
 		ShopName:   shop_name,
