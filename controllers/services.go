@@ -224,6 +224,8 @@ func CreateElerec(c *gin.Context) {
 
 	user := &User{ID: user_id}
 	getErr := dbConnect.Model(user).WherePK().Select()
+	log.Printf("insert electronic receipt to user error, Reason: %v\n", user)
+
 	if getErr != nil {
 		log.Printf("can't get a user, so new one, Database: %v\n", getErr)
 		user.EleRecs = append(user.EleRecs, EleRec{
@@ -279,7 +281,7 @@ func CreateElerec(c *gin.Context) {
 		panic(err)
 	}
 
-	log.Printf("insert electronic receipt to user error, Reason: %v\n", err)
+	log.Printf("insert electronic receipt to user error, Reason: %v\n", user)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  200,
