@@ -224,7 +224,7 @@ func CreateElerec(c *gin.Context) {
 
 	user := &User{ID: user_id}
 	getErr := dbConnect.Model(user).WherePK().Select()
-	log.Printf("insert electronic receipt to user error, Reason: %v\n", user)
+	log.Printf("user first:: %v\n", user)
 
 	if getErr != nil {
 		log.Printf("can't get a user, so new one, Database: %v\n", getErr)
@@ -257,7 +257,6 @@ func CreateElerec(c *gin.Context) {
 		UserID:     user_id,
 		ShopName:   shop_name,
 		TotalPrice: total_price,
-		CreatedAt:  created_at,
 		PayMethod:  pay_method,
 		Ticket:     ticket,
 		SerialNum:  serial_num,
@@ -265,10 +264,11 @@ func CreateElerec(c *gin.Context) {
 		PosNum:     pos_num,
 	})
 
+	log.Printf("updated user: %v\n", user)
 	
-	-, err := dbConnect.Model(user).WherePK().Update()
+	_, err := dbConnect.Model(user).Relation("EleRecs").WherePK().Update()
 	if err != nil {
-		log.Printf("insert electronic receipt to user error, Reason: %v\n", err)
+		log.Printf("2insert electronic receipt to user error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
 			"message": "Something went wrong: Error while add new electronic receipt a user",
@@ -276,12 +276,12 @@ func CreateElerec(c *gin.Context) {
 		return
 	}
 
-	err = db.Model(user).WherePK().Select()
+	err = dbConnect.Model(user).WherePK().Select()
 	if err != nil {
 		panic(err)
 	}
 
-	log.Printf("insert electronic receipt to user error, Reason: %v\n", user)
+	log.Printf("3insert electronic receipt to user error, Reason: %v\n", user)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  200,

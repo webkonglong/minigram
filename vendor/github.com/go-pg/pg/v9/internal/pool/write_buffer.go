@@ -3,24 +3,7 @@ package pool
 import (
 	"encoding/binary"
 	"io"
-	"sync"
 )
-
-const defaultBufSize = 65536
-
-var pool = sync.Pool{
-	New: func() interface{} {
-		return NewWriteBuffer()
-	},
-}
-
-func getWriteBuffer() *WriteBuffer {
-	return pool.Get().(*WriteBuffer)
-}
-
-func putWriteBuffer(wb *WriteBuffer) {
-	pool.Put(wb)
-}
 
 type WriteBuffer struct {
 	Bytes []byte
@@ -30,7 +13,7 @@ type WriteBuffer struct {
 
 func NewWriteBuffer() *WriteBuffer {
 	return &WriteBuffer{
-		Bytes: make([]byte, 0, defaultBufSize),
+		Bytes: make([]byte, 0, 4096),
 	}
 }
 

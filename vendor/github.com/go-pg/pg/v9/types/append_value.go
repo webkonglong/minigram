@@ -2,14 +2,13 @@ package types
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"net"
 	"reflect"
 	"strconv"
 	"sync"
 	"time"
-
-	"github.com/segmentio/encoding/json"
 
 	"github.com/go-pg/pg/v9/internal"
 )
@@ -180,19 +179,11 @@ func appendStructValue(b []byte, v reflect.Value, flags int) []byte {
 }
 
 func appendJSONValue(b []byte, v reflect.Value, flags int) []byte {
-	buf := internal.GetBuffer()
-	defer internal.PutBuffer(buf)
-
-	if err := json.NewEncoder(buf).Encode(v.Interface()); err != nil {
+	bytes, err := json.Marshal(v.Interface())
+	if err != nil {
 		return AppendError(b, err)
 	}
-
-	bb := buf.Bytes()
-	if len(bb) > 0 && bb[len(bb)-1] == '\n' {
-		bb = bb[:len(bb)-1]
-	}
-
-	return AppendJSONB(b, bb, flags)
+	return AppendJSONB(b, bytes, flags)
 }
 
 func appendTimeValue(b []byte, v reflect.Value, flags int) []byte {

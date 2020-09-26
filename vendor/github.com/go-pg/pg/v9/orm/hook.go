@@ -88,18 +88,6 @@ func callHookSlice2(
 
 //------------------------------------------------------------------------------
 
-type BeforeScanHook interface {
-	BeforeScan(context.Context) error
-}
-
-var beforeScanHookType = reflect.TypeOf((*BeforeScanHook)(nil)).Elem()
-
-func callBeforeScanHook(c context.Context, v reflect.Value) error {
-	return v.Interface().(BeforeScanHook).BeforeScan(c)
-}
-
-//------------------------------------------------------------------------------
-
 type AfterScanHook interface {
 	AfterScan(context.Context) error
 }
@@ -108,6 +96,10 @@ var afterScanHookType = reflect.TypeOf((*AfterScanHook)(nil)).Elem()
 
 func callAfterScanHook(c context.Context, v reflect.Value) error {
 	return v.Interface().(AfterScanHook).AfterScan(c)
+}
+
+func callAfterScanHookSlice(c context.Context, slice reflect.Value, ptr bool) error {
+	return callHookSlice2(c, slice, ptr, callAfterScanHook)
 }
 
 //------------------------------------------------------------------------------

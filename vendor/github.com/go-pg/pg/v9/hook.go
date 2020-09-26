@@ -8,18 +8,6 @@ import (
 	"github.com/go-pg/pg/v9/orm"
 )
 
-type BeforeScanHook = orm.BeforeScanHook
-type AfterScanHook = orm.AfterScanHook
-type AfterSelectHook = orm.AfterSelectHook
-type BeforeInsertHook = orm.BeforeInsertHook
-type AfterInsertHook = orm.AfterInsertHook
-type BeforeUpdateHook = orm.BeforeUpdateHook
-type AfterUpdateHook = orm.AfterUpdateHook
-type BeforeDeleteHook = orm.BeforeDeleteHook
-type AfterDeleteHook = orm.AfterDeleteHook
-
-//------------------------------------------------------------------------------
-
 type dummyFormatter struct{}
 
 func (dummyFormatter) FormatQuery(b []byte, query string, params ...interface{}) []byte {
@@ -118,14 +106,12 @@ func (db *baseDB) afterQuery(
 
 	event.Err = err
 	event.Result = res
-
 	for _, hook := range db.queryHooks {
 		err := hook.AfterQuery(c, event)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
