@@ -186,7 +186,6 @@ func CreateUser(c *gin.Context) {
 func CreateElerec(c *gin.Context) {
 	var elerec EleRec
 	var items []Item
-	var user User
 
 	c.BindJSON(&elerec)
 	elerec_id := elerec.ID
@@ -224,7 +223,7 @@ func CreateElerec(c *gin.Context) {
 
 	log.Printf("test: %v\n", user_id)
 
-	user = User{ID: user_id}
+	user := &User{ID: user_id}
 	getErr := dbConnect.Select(user)
 	if getErr != nil {
 		log.Printf("Error while getting a user, Reason: %v\n", getErr)
