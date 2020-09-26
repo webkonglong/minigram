@@ -226,16 +226,29 @@ func CreateElerec(c *gin.Context) {
 	user := &User{ID: user_id}
 	getErr := dbConnect.Select(user)
 	if getErr != nil {
-		log.Printf("Error while getting a user, Reason: %v\n", getErr)
-		c.JSON(http.StatusNotFound, gin.H{
-			"status":  http.StatusNotFound,
-			"message": "user not found",
+		log.Printf("can't get a user, so new one, Database: %v\n", getErr)
+		user.EleRecs = append(user.EleRecs, EleRec{
+			ID:         elerec_id,
+			UserID:     user_id,
+			ShopName:   shop_name,
+			TotalPrice: total_price,
+			CreatedAt:  created_at,
+			PayMethod:  pay_method,
+			Ticket:     ticket,
+			SerialNum:  serial_num,
+			Items:      items,
+			PosNum:     pos_num,
 		})
+		insertUserErr := dbConnect.Insert(user)
+		if insertUserErr != nil {
+			log.Printf("can't new one user, Database: %v\n", insertUserErr)
+			return
+		}
 		return
 	}
-	
+
 	elerecs := user.EleRecs
-	user.Elerecs = append(elerecs, EleRec{
+	user.EleRecs = append(elerecs, EleRec{
 		ID:         elerec_id,
 		UserID:     user_id,
 		ShopName:   shop_name,
@@ -248,7 +261,12 @@ func CreateElerec(c *gin.Context) {
 		PosNum:     pos_num,
 	})
 
-	_, err := dbConnect.Model(user).Where("id = ?", user_id).Update()
+	deleteErr := dbConnect.Delete(user)
+	if deleteErr != nil {
+		log.Printf("Error while deleting a single todo, Reason: %v\n", deleteErr)
+		return
+	}
+	err := dbConnect.Insert(user)
 	if err != nil {
 		log.Printf("insert electronic receipt to user error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
