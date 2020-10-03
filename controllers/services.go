@@ -12,7 +12,7 @@ import (
 
 type User struct {
 	ID      string   `json:"id"`
-	EleRecs []EleRec `json:"elerecs"`
+	EleRecs []string `json:"elerecs"`
 }
 
 type EleRec struct {
@@ -160,7 +160,34 @@ func CreateUser(c *gin.Context) {
 	var user User
 	c.BindJSON(&user)
 	user_id := user.ID
-	var elerecs []EleRec
+	var elerecs []string
+
+	insertError := dbConnect.Insert(&User{
+		ID:      user_id,
+		EleRecs: elerecs,
+	})
+
+	if insertError != nil {
+		log.Printf("Error while inserting new user into db, Reason: %v\n", insertError)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Something went wrong",
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"status":  http.StatusCreated,
+		"message": "User created Successfully",
+	})
+	return
+}
+
+func Test(c *gin.Context) {
+	var user User
+	c.BindJSON(&user)
+	user_id := user.ID
+	var elerecs []string
 
 	insertError := dbConnect.Insert(&User{
 		ID:      user_id,
@@ -228,18 +255,7 @@ func CreateElerec(c *gin.Context) {
 
 	if getErr != nil {
 		log.Printf("can't get a user, so new one, Database: %v\n", getErr)
-		user.EleRecs = append(user.EleRecs, EleRec{
-			ID:         elerec_id,
-			UserID:     user_id,
-			ShopName:   shop_name,
-			TotalPrice: total_price,
-			CreatedAt:  created_at,
-			PayMethod:  pay_method,
-			Ticket:     ticket,
-			SerialNum:  serial_num,
-			Items:      items,
-			PosNum:     pos_num,
-		})
+		user.EleRecs = append(user.EleRecs,elerec_id)
 		insertUserErr := dbConnect.Insert(user)
 		if insertUserErr != nil {
 			log.Printf("can't new one user, Database: %v\n", insertUserErr)
@@ -252,17 +268,7 @@ func CreateElerec(c *gin.Context) {
 		return
 	}
 
-	user.EleRecs = append(user.EleRecs, EleRec{
-		ID:         elerec_id,
-		UserID:     user_id,
-		ShopName:   shop_name,
-		TotalPrice: total_price,
-		PayMethod:  pay_method,
-		Ticket:     ticket,
-		SerialNum:  serial_num,
-		Items:      items,
-		PosNum:     pos_num,
-	})
+	user.EleRecs = append(user.EleRecs, elerec_id)
 
 	log.Printf("updated user: %v\n", user)
 	
