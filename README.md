@@ -36,7 +36,7 @@ $ curl --request POST   --url http://localhost:8080/v1/user    --header 'content
 
 ### 创建电子小票
 1. 接口 `/v1/elerec`
-2. 数据格式 `{"ID":"1","user_id":"3","shop_name":"tyn品牌","total_price":-999.00,"created_at":"2020-09-24T23:07:25.678773-07:00","pay_method":"微信","ticket":-20,"serial_num":"2020042363186489198787","items": [{"name":"tyn满减商品01","amount":1,"price":333.0},{"name":"tyn满减商品02","amount":1,"price":333.0},{"name":"tyn满减商品03","amount":1,"price":313.0}],"pos_num":"0058"}`
+2. 数据格式 `{"id":"1","user_id":"3","shop_name":"tyn品牌","total_price":-999.00,"created_at":"2020-09-24T23:07:25.678773-07:00","pay_method":"微信","ticket":-20,"serial_num":"2020042363186489198787","items": [{"name":"tyn满减商品01","amount":1,"price":333.0},{"name":"tyn满减商品02","amount":1,"price":333.0},{"name":"tyn满减商品03","amount":1,"price":313.0}],"pos_num":"0058"}`
 3. 示例：
 ```bash
 $ curl --request POST   --url http://localhost:8080/v1/elerec    --header 'content-type: application/json'   --data '{"ID":"1","user_id":"3","shop_name":"tyn品牌","total_price":-999.00,"created_at":"2020-09-24T23:07:25.678773-07:00","pay_method":"微信","ticket":-20,"serial_num":"2020042363186489198787","items": [{"name":"tyn满减商品01","amount":1,"price":333.0},{"name":"tyn满减商品02","amount":1,"price":333.0},{"name":"tyn满减商品03","amount":1,"price":313.0}],"pos_num":"0058"}'
@@ -45,10 +45,10 @@ $ curl --request POST   --url http://localhost:8080/v1/elerec    --header 'conte
 ```
 ### 创建区块链小票
 1. 接口 `/v1/blorec`
-2. 数据格式 `{"ID":"5","TxHash":"0x645d39378a7b9e569b95736fd93cec17e1715d07f375e8e3f2af966fb25ae79f","BlockNum":1425015,"CreatedAt":"2020-09-24T23:07:25.678773-07:00"}`
+2. 数据格式 `{"id":"5","tx_hash":"0x645d39378a7b9e569b95736fd93cec17e1715d07f375e8e3f2af966fb25ae79f","block_num":1425015,"created_at":"2020-09-24T23:07:25.678773-07:00"}`
 3. 示例
 ```bash
-$ curl --request POST   --url http://localhost:8080/v1/blorec    --header 'content-type: application/json'   --data '{"ID":"5","TxHash":"0x645d39378a7b9e569b95736fd93cec17e1715d07f375e8e3f2af966fb25ae79f","BlockNum":1425015,"CreatedAt":"2020-09-24T23:07:25.678773-07:00"}'
+$ curl --request POST   --url http://localhost:8080/v1/blorec    --header 'content-type: application/json'   --data '{"id":"5","tx_hash":"0x645d39378a7b9e569b95736fd93cec17e1715d07f375e8e3f2af966fb25ae79f","block_num":1425015,"created_at":"2020-09-24T23:07:25.678773-07:00"}'
 
 {"message":"receipt created Successfully","status":201}
 ```

@@ -137,10 +137,8 @@ func GetElerec(c *gin.Context) {
 func GetBlorec(c *gin.Context) {
 	recId := c.Param("recId")
 	bloRec := &BloRec{ID: recId}
-	log.Printf("bloRec before %v\n", bloRec)
-
+	
 	err := dbConnect.Model(bloRec).WherePK().Select()
-	log.Printf("bloRec middle %v\n", bloRec)
 	if err != nil {
 		log.Printf("Error while getting a blorec's details, Reason: %v\n", err)
 		c.JSON(http.StatusNotFound, gin.H{
@@ -155,7 +153,6 @@ func GetBlorec(c *gin.Context) {
 		"message": "blockchain receipt detail",
 		"data":    bloRec,
 	})
-	log.Printf("bloRec last %v\n", bloRec)
 	return
 }
 
