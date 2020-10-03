@@ -249,7 +249,7 @@ func CreateElerec(c *gin.Context) {
 
 	log.Printf("updated user: %v\n", user)
 	
-	_, err := dbConnect.Model(user).Relation("EleRecs").WherePK().Update()
+	_, err := dbConnect.Model(user).WherePK().Update()
 	if err != nil {
 		log.Printf("insert electronic receipt to user error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
