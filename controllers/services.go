@@ -160,34 +160,7 @@ func CreateUser(c *gin.Context) {
 	var user User
 	c.BindJSON(&user)
 	user_id := user.ID
-	var elerecs []string
-
-	insertError := dbConnect.Insert(&User{
-		ID:      user_id,
-		EleRecs: elerecs,
-	})
-
-	if insertError != nil {
-		log.Printf("Error while inserting new user into db, Reason: %v\n", insertError)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": "Something went wrong",
-		})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"status":  http.StatusCreated,
-		"message": "User created Successfully",
-	})
-	return
-}
-
-func Test(c *gin.Context) {
-	var user User
-	c.BindJSON(&user)
-	user_id := user.ID
-	var elerecs []string
+	elerecs := user.EleRecs
 
 	insertError := dbConnect.Insert(&User{
 		ID:      user_id,
@@ -261,10 +234,14 @@ func CreateElerec(c *gin.Context) {
 			log.Printf("can't new one user, Database: %v\n", insertUserErr)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"status":  http.StatusInternalServerError,
-				"message": "Something went wrong: Error while inserting new electronic receipt into db",
+				"message": "Something went wrong: Error while inserting new user into db",
 			})
 			return
 		}
+		c.JSON(http.StatusCreated, gin.H{
+			"status":  http.StatusCreated,
+			"message": "New user and eletronic created Successfully",
+		})
 		return
 	}
 
@@ -274,24 +251,18 @@ func CreateElerec(c *gin.Context) {
 	
 	_, err := dbConnect.Model(user).Relation("EleRecs").WherePK().Update()
 	if err != nil {
-		log.Printf("2insert electronic receipt to user error, Reason: %v\n", err)
+		log.Printf("insert electronic receipt to user error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Something went wrong: Error while add new electronic receipt a user",
+			"message": "Something went wrong: Error while add new electronic receipt to a user",
 		})
 		return
 	}
 
-	err = dbConnect.Model(user).WherePK().Select()
-	if err != nil {
-		panic(err)
-	}
 
-	log.Printf("3insert electronic receipt to user error, Reason: %v\n", user)
-
-	c.JSON(http.StatusOK, gin.H{
-		"status":  200,
-		"message": "User's electric receipt update Successfully",
+	c.JSON(http.StatusCreated, gin.H{
+		"status":  http.StatusCreated,
+		"message": "New electric and User's electric receipt update Successfully",
 	})
 	return
 }
