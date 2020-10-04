@@ -154,4 +154,13 @@ CREATE TABLE COMPANY(
 
 # 删除表
 DROP TABLE company;
+
+# 创建新用户
+CREATE ROLE ubuntu WITH LOGIN CREATEDB ENCRYPTED PASSWORD 'xxxxxxxxx';  
+
+# 创建新数据库
+sudo -u postgres createdb -O ubuntu ubuntu
+
+# 重置密码
+ALTER USER ubuntu PASSWORD 'newpassword';
 ```
